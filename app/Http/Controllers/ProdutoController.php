@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use DB;
+use App\Produto;
+use App\TipoProduto;
 
 class ProdutoController extends Controller
 {
@@ -13,7 +16,10 @@ class ProdutoController extends Controller
      */
     public function index()
     {
-        //
+        // Buscar os dados que estão na tabela Produtos
+        $produtos = DB::select("select Produtos.id, Produtos.nome, Produtos.preco, Tipo_Produtos.descricao from Produtos
+                                join Tipo_Produtos on Produtos.Tipo_Produtos_id = Tipo_Produtos.id");                        
+        return view('Produto.index')->with('produtos', $produtos);
     }
 
     /**
@@ -23,7 +29,9 @@ class ProdutoController extends Controller
      */
     public function create()
     {
-        //
+        // Buscar os dados que estão na tabela Tipo_Produtos
+        $tipoProdutos = DB::select('select * from Tipo_Produtos');
+        return view('Produto.create')->with('tipoProdutos', $tipoProdutos);
     }
 
     /**
@@ -34,7 +42,13 @@ class ProdutoController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $produto = new Produto();
+        $produto->nome = $request->nome;
+        $produto->preco = $request->preco;
+        $produto->Tipo_Produtos_id = $request->Tipo_Produtos_id;
+        $produto->save();
+        // Retorna a execução do método index
+        return $this->index();
     }
 
     /**
@@ -45,7 +59,16 @@ class ProdutoController extends Controller
      */
     public function show($id)
     {
-        //
+        // Buscar o dado que está na tabela Produtos
+        $produto = Produto::find($id);
+        if(isset($produto))
+        {
+            // Busca o dado que está na tabela Tipo_Produtos
+            $tipoProduto = TipoProduto::find($produto->Tipo_Produtos_id);
+            return view('Produto.show')->with('produto', $produto)->with('tipoProduto', $tipoProduto);
+        }
+        // #TODO ajustar a página de erro
+        return 'Não encontrado';
     }
 
     /**
@@ -56,7 +79,15 @@ class ProdutoController extends Controller
      */
     public function edit($id)
     {
-        //
+        // Buscar os dados que estão na tabela Tipo_Produtos
+        $produto = Produto::find($id);
+        if(isset($produto))
+        {
+            $tipoProdutos = DB::select('select * from Tipo_Produtos');
+            return view('Produto.edit')->with('produto', $produto)->with('tipoProdutos', $tipoProdutos);
+        }
+        // #TODO ajustar a página de erro
+        return 'Não encontrado';
     }
 
     /**
@@ -68,7 +99,19 @@ class ProdutoController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        // Buscar os dados que estão na tabela Tipo_Produtos
+        $produto = Produto::find($id);
+        if(isset($produto))
+        {
+            $produto->nome = $request->nome;
+            $produto->preco = $request->preco;
+            $produto->Tipo_Produtos_id = $request->Tipo_Produtos_id;
+            $produto->update();
+            // Retorna a execução do método index
+            return $this->index();
+        }
+        // #TODO ajustar a página de erro
+        return 'Não encontrado update';
     }
 
     /**
