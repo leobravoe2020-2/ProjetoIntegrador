@@ -16,10 +16,21 @@ class ProdutoController extends Controller
      */
     public function index()
     {
+        // Retorna a execução do método indexMessage
+        return $this->indexMessage(null);
+    }
+
+    /**
+     * Display a listing of the resource. With message message
+     *
+     * @return \Illuminate\Http\Response
+     */
+    private function indexMessage($message)
+    {
         // Buscar os dados que estão na tabela Produtos
         $produtos = DB::select("select Produtos.id, Produtos.nome, Produtos.preco, Tipo_Produtos.descricao from Produtos
                                 join Tipo_Produtos on Produtos.Tipo_Produtos_id = Tipo_Produtos.id");                        
-        return view('Produto.index')->with('produtos', $produtos);
+        return view('Produto.index')->with('produtos', $produtos)->with('message', $message);
     }
 
     /**
@@ -46,8 +57,19 @@ class ProdutoController extends Controller
         $produto->nome = $request->nome;
         $produto->preco = $request->preco;
         $produto->Tipo_Produtos_id = $request->Tipo_Produtos_id;
-        $produto->save();
-        // Retorna a execução do método index
+        try{
+            $produto->save();
+        } catch (\Throwable $th) {
+            // Constrói a mensagem
+            $message['type'] = 'danger';
+            $message['message'] = "Problema ao salvar um recurso: " . $th->getMessage();
+            // Retorna a execução do método indexMessage
+            return $this->indexMessage($message);
+        }
+        // Constrói a mensagem
+        $message['type'] = 'success';
+        $message['message'] = 'Recurso cadastrado com sucesso';
+        // Retorna a execução do método indexMessage
         return $this->index();
     }
 
@@ -67,8 +89,11 @@ class ProdutoController extends Controller
             $tipoProduto = TipoProduto::find($produto->Tipo_Produtos_id);
             return view('Produto.show')->with('produto', $produto)->with('tipoProduto', $tipoProduto);
         }
-        // #TODO ajustar a página de erro
-        return 'Não encontrado';
+        // Constrói a mensagem
+        $message['type'] = 'danger';
+        $message['message'] = 'Recurso não encontrado';
+        // Retorna a execução do método indexMessage
+        return $this->indexMessage($message);
     }
 
     /**
@@ -86,8 +111,11 @@ class ProdutoController extends Controller
             $tipoProdutos = DB::select('select * from Tipo_Produtos');
             return view('Produto.edit')->with('produto', $produto)->with('tipoProdutos', $tipoProdutos);
         }
-        // #TODO ajustar a página de erro
-        return 'Não encontrado';
+        // Constrói a mensagem
+        $message['type'] = 'danger';
+        $message['message'] = 'Recurso não encontrado';
+        // Retorna a execução do método indexMessage
+        return $this->indexMessage($message);
     }
 
     /**
@@ -106,12 +134,26 @@ class ProdutoController extends Controller
             $produto->nome = $request->nome;
             $produto->preco = $request->preco;
             $produto->Tipo_Produtos_id = $request->Tipo_Produtos_id;
-            $produto->update();
-            // Retorna a execução do método index
-            return $this->index();
+            try {
+                $produto->update();
+            } catch (\Throwable $th) {
+                // Constrói a mensagem
+                $message['type'] = 'danger';
+                $message['message'] = "Problema ao atualizar um recurso: " . $th->getMessage();
+                // Retorna a execução do método indexMessage
+                return $this->indexMessage($message);
+            }
+            // Constrói a mensagem
+            $message['type'] = 'success';
+            $message['message'] = 'Recurso atualizado com sucesso';
+            // Retorna a execução do método indexMessage
+            return $this->indexMessage($message);
         }
-        // #TODO ajustar a página de erro
-        return 'Não encontrado update';
+        // Constrói a mensagem
+        $message['type'] = 'danger';
+        $message['message'] = 'Recurso não encontrado';
+        // Retorna a execução do método indexMessage
+        return $this->indexMessage($message);
     }
 
     /**
@@ -122,6 +164,28 @@ class ProdutoController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $produto = Produto::find($id);
+        if(isset($produto))
+        {
+            try {
+                $produto->delete();
+            } catch (\Throwable $th) {
+                // Constrói a mensagem
+                $message['type'] = 'danger';
+                $message['message'] = "Problema ao remover um recurso: " . $th->getMessage();
+                // Retorna a execução do método indexMessage
+                return $this->indexMessage($message);
+            }
+            // Constrói a mensagem
+            $message['type'] = 'success';
+            $message['message'] = 'Recurso removido com sucesso';
+            // Retorna a execução do método indexMessage
+            return $this->indexMessage($message);
+        }
+        // Constrói a mensagem
+        $message['type'] = 'danger';
+        $message['message'] = 'Recurso não encontrado';
+        // Retorna a execução do método indexMessage
+        return $this->indexMessage($message);
     }
 }
