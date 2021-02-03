@@ -70,7 +70,7 @@ class ProdutoController extends Controller
         $message['type'] = 'success';
         $message['message'] = 'Recurso cadastrado com sucesso';
         // Retorna a execução do método indexMessage
-        return $this->index();
+        return $this->indexMessage($message);
     }
 
     /**
