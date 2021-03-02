@@ -30,12 +30,12 @@ $('#id-form-novo-pedido').on('submit', function(event){
     });
 });
 
-$("#id-selecao-tipo-produto").on('change', function(event){
+$("#id-selecao-tipo-produto").on('change', function(){
     const tipoProdutoId = $('#id-selecao-tipo-produto').val();
     $.ajax({
         type: "GET",
         url: `/pedidoproduto/getTodosProdutosDeTipo/${tipoProdutoId}`,
-        data: null, //$(this).serialize(),
+        data: null,
         dataType: 'json',
         success: function(response) {
             $('#id-selecao-produto').html("");
