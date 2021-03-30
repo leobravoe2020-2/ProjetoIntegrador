@@ -189,4 +189,34 @@ class PedidoController extends Controller
     {
         //
     }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function enviarPedido(Request $request, $pedido_id)
+    {
+        $pedido = Pedido::find($pedido_id);
+        if(isset($pedido)){
+            try {
+                $pedido->status = 'E';
+                $pedido->update();
+            } catch (\Throwable $th) {
+                $response['success'] = false;
+                $response['message'] = "Não foi possível atualizar o pedido.";
+                $response['return'] = [];
+                return response()->json($response, 507);
+            }
+            $response['success'] = true;
+            $response['message'] = "Pedido enviado com sucesso.";
+            $response['return'] = $pedido;
+            return response()->json($response, 201);
+        }
+        $response['success'] = false;
+        $response['message'] = "Pedido não encontrado.";
+        $response['return'] = [];
+        return response()->json($response, 404);
+    }
 }

@@ -60,9 +60,9 @@
                 </form>
                 <input id="spinner" name="value" value=1>
                 {{-- Botão adicionar produto no pedido --}}
-                <form method="POST" class="my-3" action="#">
+                <form id="id-form-add-pedido-produto" method="POST" class="my-3" action="#">
                     @csrf
-                    <input type="submit" class="btn btn-success w-100" value="Adicionar Produto">
+                    <input id="id-botao-adicionar-produto" type="submit" class="btn btn-success w-100" value="Adicionar Produto">
                 </form>
                 {{-- Formulario de Endereço --}}
                 <form action="">
@@ -70,22 +70,32 @@
                     <div class="form-group">
                         <select id="id-selecao-endereco" class="form-control">
                             @foreach ($enderecos as $endereco)
-                                <option value={{$endereco->id}}>
-                                    {{$endereco->logradouro}}, nº {{$endereco->numero}}. {{$endereco->bairro}}
-                                    @if ($endereco->complemento)
-                                        . {{$endereco->complemento}}    
-                                    @endif
-                                </option>
+                                @if ($pedidos[0]->Enderecos_id == $endereco->id)
+                                    <option value={{$endereco->id}} selected>
+                                        {{$endereco->logradouro}}, nº {{$endereco->numero}}. {{$endereco->bairro}}
+                                        @if ($endereco->complemento)
+                                            . {{$endereco->complemento}}    
+                                        @endif
+                                    </option>
+                                @else
+                                    <option value={{$endereco->id}}>
+                                        {{$endereco->logradouro}}, nº {{$endereco->numero}}. {{$endereco->bairro}}
+                                        @if ($endereco->complemento)
+                                            . {{$endereco->complemento}}    
+                                        @endif
+                                    </option>
+                                @endif
                             @endforeach
-                            <option value=null>Retirar no local</option>
-                            
-                            {{-- <option>Rua X</option>
-                            <option>Rua Y</option> --}}
+                            @if ($pedidos[0]->Enderecos_id == null)
+                                <option value=null selected>Retirar no local</option>
+                            @else
+                                <option value=null>Retirar no local</option>
+                            @endif
                         </select>
                     </div>
                 </form>
                 {{-- Botão enviar --}}
-                <form method="POST" class="my-3" action="#">
+                <form id="id-form-enviar-pedido" method="POST" class="my-3" action="#">
                     @csrf
                     <input type="submit" class="btn btn-info w-100" value="Enviar Pedido">
                 </form>
@@ -93,7 +103,7 @@
             {{-- Parte da direita --}}
             <div class="col-lg-4">
                 <div class="form-group my-3">
-                    <input type="text" class="form-control text-center" id="id-text-status" value="Estado: {{$estado}}" readonly>
+                    <input id="id-text-status" type="text" class="form-control text-center" id="id-text-status" value="Estado: {{$estado}}" readonly>
                 </div>
                 <div id="list-produtos" class="list-group my-3">
                     @foreach ($produtosPedido as $produtoPedido)
@@ -110,7 +120,7 @@
                     <input type="text" class="form-control" value="Valor total">
                     <div class="input-group-append">
                         <span class="input-group-text">R$</span>
-                        <span class="input-group-text">{{$totalPedido}}</span>
+                        <span id="id-spam-preco" class="input-group-text">{{$totalPedido}}</span>
                     </div>
                 </div>
             </div>
